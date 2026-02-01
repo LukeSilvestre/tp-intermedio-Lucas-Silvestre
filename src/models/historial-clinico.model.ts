@@ -36,20 +36,30 @@ export const getHistorialById = async (id: number, usuarioId: number): Promise<H
   return historiales.length > 0 ? historiales[0] : null;
 };
 
-// Crear nuevo historial (asociado al usuario)
+// Crear un nuevo registro en el historial clínico
 export const createHistorial = async (
-  dto: CreateHistorialDTO,
+  datosNuevos: CreateHistorialDTO,
   usuarioId: number,
   veterinarioId: number
 ): Promise<number> => {
-  const [result] = await pool.execute(
-    `INSERT INTO historial_clinico 
-     (id_mascota, id_veterinario, usuario_id, descripcion) 
-     VALUES (?, ?, ?, ?)`,
-    [dto.id_mascota, veterinarioId, usuarioId, dto.descripcion]
-  );
   
-  return (result as any).insertId;
+  const consultaSQL = `
+    INSERT INTO historial_clinico 
+    (id_mascota, id_veterinario, usuario_id, descripcion) 
+    VALUES (?, ?, ?, ?)
+  `;
+  
+  const parametros = [
+    datosNuevos.id_mascota,
+    veterinarioId,
+    usuarioId,
+    datosNuevos.descripcion
+  ];
+  
+  const [resultado] = await pool.execute(consultaSQL, parametros);
+  const idInsertado = (resultado as any).insertId;
+  
+  return idInsertado;
 };
 
 // Actualizar historial (solo si pertenece al usuario o es admin)
