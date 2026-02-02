@@ -1,4 +1,3 @@
-// src/types/usuario.ts
 export enum UserRole {
   ADMIN = 'admin',
   VETERINARIO = 'veterinario'
@@ -23,11 +22,6 @@ export interface CreateUsuarioDTO {
   rol?: UserRole;
 }
 
-export interface LoginDTO {
-  email: string;
-  password: string;
-}
-
 export interface UsuarioResponseDTO {
   id: number;
   email: string;
@@ -35,13 +29,4 @@ export interface UsuarioResponseDTO {
   apellido: string;
   rol: UserRole;
   created_at: Date;
-}
-
-// Payload para JWT token
-export interface JwtPayload {
-  id: number;
-  email: string;
-  nombre: string;
-  apellido: string;
-  rol: UserRole;
 }

@@ -1,6 +1,8 @@
 import pool from '../config/database';
 import bcrypt from 'bcrypt';
-import { Usuario, CreateUsuarioDTO, LoginDTO, UsuarioResponseDTO } from '../types/usuario';
+import { Usuario } from '../types/usuario';
+import { LoginDTO, CreateUsuarioDTO } from '../types/auth';  // Los DTOs ahora están en auth
+import { UsuarioResponseDTO } from '../types/usuario';  // Este SÍ debe estar en usuario.ts
 
 // Buscar usuario por email
 export const findUsuarioByEmail = async (email: string): Promise<Usuario | null> => {
