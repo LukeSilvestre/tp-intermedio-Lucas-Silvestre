@@ -36,6 +36,34 @@ export const getHistorialById = async (id: number, usuarioId: number): Promise<H
   return historiales.length > 0 ? historiales[0] : null;
 };
 
+// Obtener TODOS los historiales (para admin)
+export const getAllHistoriales = async (): Promise<HistorialResponseDTO[]> => {
+  const [rows] = await pool.execute(
+    `SELECT hc.*, m.nombre as mascota_nombre, v.nombre as veterinario_nombre
+     FROM historial_clinico hc
+     JOIN mascotas m ON hc.id_mascota = m.id
+     JOIN veterinarios v ON hc.id_veterinario = v.id
+     ORDER BY hc.fecha_registro DESC`
+  );
+  
+  return rows as HistorialResponseDTO[];
+};
+
+// Obtener historial por ID sin restricción de usuario (para admin)
+export const getHistorialByIdSinRestriccion = async (id: number): Promise<HistorialResponseDTO | null> => {
+  const [rows] = await pool.execute(
+    `SELECT hc.*, m.nombre as mascota_nombre, v.nombre as veterinario_nombre
+     FROM historial_clinico hc
+     JOIN mascotas m ON hc.id_mascota = m.id
+     JOIN veterinarios v ON hc.id_veterinario = v.id
+     WHERE hc.id = ?`,
+    [id]
+  );
+  
+  const historiales = rows as HistorialResponseDTO[];
+  return historiales.length > 0 ? historiales[0] : null;
+};
+
 // Crear un nuevo registro en el historial clínico
 export const createHistorial = async (
   datosNuevos: CreateHistorialDTO,

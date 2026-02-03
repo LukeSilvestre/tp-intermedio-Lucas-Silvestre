@@ -33,5 +33,5 @@ export interface CreateUsuarioDTO {
   password: string;
   nombre: string;
   apellido: string;
-  rol?: UserRole;
+  rol?: string | UserRole ;
 }
