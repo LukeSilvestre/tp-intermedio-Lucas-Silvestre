@@ -9,9 +9,10 @@ import {
 // Obtener historial por ID de usuario (protección)
 export const getHistorialByUsuario = async (usuarioId: number): Promise<HistorialResponseDTO[]> => {
   const [rows] = await pool.execute(
-    `SELECT hc.*, m.nombre as mascota_nombre, v.nombre as veterinario_nombre
+    `SELECT hc.*, m.nombre as mascota_nombre, d.nombre as duenio_nombre, v.nombre as veterinario_nombre
      FROM historial_clinico hc
      JOIN mascotas m ON hc.id_mascota = m.id
+     JOIN duenios d ON m.id_duenio = d.id
      JOIN veterinarios v ON hc.id_veterinario = v.id
      WHERE hc.usuario_id = ?
      ORDER BY hc.fecha_registro DESC`,
@@ -24,12 +25,43 @@ export const getHistorialByUsuario = async (usuarioId: number): Promise<Historia
 // Obtener historial por ID (solo si pertenece al usuario)
 export const getHistorialById = async (id: number, usuarioId: number): Promise<HistorialResponseDTO | null> => {
   const [rows] = await pool.execute(
-    `SELECT hc.*, m.nombre as mascota_nombre, v.nombre as veterinario_nombre
+    `SELECT hc.*, m.nombre as mascota_nombre, d.nombre as duenio_nombre, v.nombre as veterinario_nombre
      FROM historial_clinico hc
      JOIN mascotas m ON hc.id_mascota = m.id
+     JOIN duenios d ON m.id_duenio = d.id
      JOIN veterinarios v ON hc.id_veterinario = v.id
      WHERE hc.id = ? AND hc.usuario_id = ?`,
     [id, usuarioId]
+  );
+  
+  const historiales = rows as HistorialResponseDTO[];
+  return historiales.length > 0 ? historiales[0] : null;
+};
+
+// Obtener TODOS los historiales (para admin)
+export const getAllHistoriales = async (): Promise<HistorialResponseDTO[]> => {
+  const [rows] = await pool.execute(
+    `SELECT hc.*, m.nombre as mascota_nombre, d.nombre as duenio_nombre, v.nombre as veterinario_nombre
+     FROM historial_clinico hc
+     JOIN mascotas m ON hc.id_mascota = m.id
+     JOIN duenios d ON m.id_duenio = d.id
+     JOIN veterinarios v ON hc.id_veterinario = v.id
+     ORDER BY hc.fecha_registro DESC`
+  );
+  
+  return rows as HistorialResponseDTO[];
+};
+
+// Obtener historial por ID sin restricción de usuario (para admin)
+export const getHistorialByIdSinRestriccion = async (id: number): Promise<HistorialResponseDTO | null> => {
+  const [rows] = await pool.execute(
+    `SELECT hc.*, m.nombre as mascota_nombre, d.nombre as duenio_nombre, v.nombre as veterinario_nombre
+     FROM historial_clinico hc
+     JOIN mascotas m ON hc.id_mascota = m.id
+     JOIN duenios d ON m.id_duenio = d.id
+     JOIN veterinarios v ON hc.id_veterinario = v.id
+     WHERE hc.id = ?`,
+    [id]
   );
   
   const historiales = rows as HistorialResponseDTO[];

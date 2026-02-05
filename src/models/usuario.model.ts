@@ -1,6 +1,8 @@
 import pool from '../config/database';
 import bcrypt from 'bcrypt';
-import { Usuario, CreateUsuarioDTO, LoginDTO, UsuarioResponseDTO } from '../types/usuario';
+import { Usuario } from '../types/usuario';
+import { LoginDTO, CreateUsuarioDTO } from '../types/auth';  // Los DTOs ahora están en auth
+import { UsuarioResponseDTO } from '../types/usuario';  // Este SÍ debe estar en usuario.ts
 
 // Buscar usuario por email
 export const findUsuarioByEmail = async (email: string): Promise<Usuario | null> => {
@@ -25,13 +27,22 @@ export const findUsuarioById = async (id: number): Promise<Usuario | null> => {
 };
 
 // Crear nuevo usuario (para registro)
-export const createUsuario = async (dto: CreateUsuarioDTO): Promise<number> => {
-  const hashedPassword = await bcrypt.hash(dto.password, 10);
+export const createUsuario = async (dto: {
+  email: string;
+  password: string;  // Este ya viene HASHEADO
+  nombre: string;
+  apellido: string;
+  rol?: string;
+}): Promise<number> => {
+  
+  const rolParaBD = (dto.rol === 'admin' || dto.rol === 'veterinario') 
+    ? dto.rol 
+    : 'veterinario';
   
   const [result] = await pool.execute(
     `INSERT INTO usuarios (email, password_hash, nombre, apellido, rol) 
      VALUES (?, ?, ?, ?, ?)`,
-    [dto.email, hashedPassword, dto.nombre, dto.apellido, dto.rol || 'veterinario']
+    [dto.email, dto.password, dto.nombre, dto.apellido, rolParaBD]
   );
   
   return (result as any).insertId;

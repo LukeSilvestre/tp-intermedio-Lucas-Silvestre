@@ -20,6 +20,7 @@ export interface HistorialResponseDTO {
   id: number;
   id_mascota: number;
   mascota_nombre: string;
+  duenio_nombre: string;
   id_veterinario: number;
   veterinario_nombre: string;
   usuario_id: number;

@@ -2,8 +2,11 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import { testConnection } from './config/database';
+import authRoutes from './routes/auth.routes';
+import historialRoutes from './routes/historial.routes';
+import duenioRoutes from './routes/duenio.routes';
 
-// Cargar variables de entorno
+// Carga variables de entorno
 dotenv.config();
 
 const app = express();
@@ -11,6 +14,11 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware básico
 app.use(express.json());
+
+//Rutas APIs
+app.use('/api/auth', authRoutes);
+app.use('/api/historial', historialRoutes);
+app.use('/api/duenios', duenioRoutes);
 
 // Ruta de prueba simple
 app.get('/api/saludo', (req: Request, res: Response) => {
@@ -29,13 +37,20 @@ app.get('/api/test-db', async (req: Request, res: Response) => {
   }
 });
 
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ 
+    error: 'Ruta no encontrada',
+    ruta: req.originalUrl
+  });
+});
+
 // Primero abro conexión a MySQL y luego inicio servidor node.js -- Las variables las levanto del .env
 async function iniciarServidor() {
   try {
-    // Probar conexión a MySQL
+    // Prueba conexión a MySQL
     await testConnection();
     
-    // Iniciar servidor HTTP
+    // Inicia servidor HTTP
     app.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
       console.log(`📊 Ruta de prueba BD: http://localhost:${PORT}/api/test-db`);
@@ -47,5 +62,5 @@ async function iniciarServidor() {
   }
 }
 
-// Iniciar la aplicación
+// Inicia la aplicación
 iniciarServidor();
