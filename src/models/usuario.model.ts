@@ -27,9 +27,14 @@ export const findUsuarioById = async (id: number): Promise<Usuario | null> => {
 };
 
 // Crear nuevo usuario (para registro)
-export const createUsuario = async (dto: CreateUsuarioDTO): Promise<number> => {
-  const hashedPassword = await bcrypt.hash(dto.password, 10);
-
+export const createUsuario = async (dto: {
+  email: string;
+  password: string;  // Este ya viene HASHEADO
+  nombre: string;
+  apellido: string;
+  rol?: string;
+}): Promise<number> => {
+  
   const rolParaBD = (dto.rol === 'admin' || dto.rol === 'veterinario') 
     ? dto.rol 
     : 'veterinario';
@@ -37,7 +42,7 @@ export const createUsuario = async (dto: CreateUsuarioDTO): Promise<number> => {
   const [result] = await pool.execute(
     `INSERT INTO usuarios (email, password_hash, nombre, apellido, rol) 
      VALUES (?, ?, ?, ?, ?)`,
-    [dto.email, dto.password, dto.nombre, dto.apellido, dto.rol || 'veterinario']
+    [dto.email, dto.password, dto.nombre, dto.apellido, rolParaBD]
   );
   
   return (result as any).insertId;

@@ -1,13 +1,15 @@
 import { Router } from 'express';
 import { registrar, login, obtenerPerfil } from '../controllers/auth.controller';
 import { verificarToken } from '../middlewares/auth.middleware';
-// Luego agregaremos validadores
+import { registrarValidator, loginValidator } from '../validators/auth.validator';
+
 
 const router = Router();
 
 // Públicas
-router.post('/registrar', registrar);
-router.post('/login', login);
+router.post('/registrar', registrarValidator, registrar);
+router.post('/login', loginValidator, login);
+
 
 // Protegida (requiere token)
 router.get('/perfil', verificarToken, obtenerPerfil);

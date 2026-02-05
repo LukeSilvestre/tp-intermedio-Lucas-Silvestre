@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { testConnection } from './config/database';
 import authRoutes from './routes/auth.routes';
 import historialRoutes from './routes/historial.routes';
+import duenioRoutes from './routes/duenio.routes';
 
 // Carga variables de entorno
 dotenv.config();
@@ -17,6 +18,7 @@ app.use(express.json());
 //Rutas APIs
 app.use('/api/auth', authRoutes);
 app.use('/api/historial', historialRoutes);
+app.use('/api/duenios', duenioRoutes);
 
 // Ruta de prueba simple
 app.get('/api/saludo', (req: Request, res: Response) => {

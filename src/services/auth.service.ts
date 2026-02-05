@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import * as usuarioModel from '../models/usuario.model';
+import * as veterinarioModel from '../models/veterinario.model';
 import { CreateUsuarioDTO, LoginDTO, JwtPayload, LoginResponseDTO } from '../types/auth';
 import { toResponseDTO } from '../models/usuario.model';
 
@@ -8,26 +9,33 @@ const JWT_SECRET = process.env.JWT_SECRET as string;
 
 // Registrar nuevo usuario (solo admin puede hacer esto)
 export const registrarUsuario = async (dto: CreateUsuarioDTO): Promise<number> => {
-  console.log('🔐 Contraseña original:', dto.password);
-  
   const passwordHasheado = await bcrypt.hash(dto.password, 10);
-  console.log('🔐 Hash generado:', passwordHasheado.substring(0, 30) + '...');
-
-    const usuarioParaCrear = {
-    email: dto.email,
-    password: passwordHasheado,
-    nombre: dto.nombre,
-    apellido: dto.apellido,
-    rol: dto.rol || 'veterinario'
-  };
-  // Aquí debería/necesitaría modificar createUsuario para aceptar password hasheado
-  const usuarioCreado = await usuarioModel.createUsuario(usuarioParaCrear);
-  console.log('✅ ID creado:', usuarioCreado);
-    //    ...dto,
-    //password: passwordHasheado
-  //);
   
-  return usuarioCreado;
+  // 1. Crear usuario
+const usuarioId = await usuarioModel.createUsuario({
+  email: dto.email,
+  password: passwordHasheado,
+  nombre: dto.nombre,
+  apellido: dto.apellido,
+  rol: dto.rol || 'veterinario'
+});
+  
+  // 2. Si es veterinario, crear registro en tabla veterinarios
+  if (dto.rol === 'veterinario') {
+    
+    const matricula = dto.matricula || `VET-${Date.now()}`;
+    const especialidad = dto.especialidad || 'General';
+    
+    await veterinarioModel.crearVeterinario({
+      nombre: dto.nombre,
+      apellido: dto.apellido,
+      matricula,
+      especialidad,
+      usuario_id: usuarioId
+    });
+  }
+  
+  return usuarioId;
 };
 
 // Iniciar sesión y generar token

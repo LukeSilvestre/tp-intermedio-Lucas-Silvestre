@@ -33,5 +33,7 @@ export interface CreateUsuarioDTO {
   password: string;
   nombre: string;
   apellido: string;
-  rol?: string | UserRole ;
+  rol?: string | UserRole;
+  matricula?: string;      
+  especialidad?: string;   
 }

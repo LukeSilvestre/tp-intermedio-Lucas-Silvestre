@@ -7,7 +7,7 @@ import {
   eliminarHistorial 
 } from '../controllers/historial.controller';
 import { verificarToken, verificarRol } from '../middlewares/auth.middleware';
-// Tengo que agregar validadores
+import { crearHistorialValidator, actualizarHistorialValidator } from '../validators/historial.validator';
 
 const router = Router();
 
@@ -21,10 +21,10 @@ router.get('/', obtenerHistoriales);
 router.get('/:id', obtenerHistorialPorId);
 
 // POST /api/historial - Crear nuevo historial (solo veterinarios)
-router.post('/', verificarRol(['veterinario', 'admin']), crearHistorial);
+router.post('/', crearHistorialValidator, crearHistorial);
 
 // PATCH /api/historial/:id - Actualizar historial (veterinario solo los suyos, admin cualquiera)
-router.patch('/:id', actualizarHistorial);
+router.patch('/:id', actualizarHistorialValidator, actualizarHistorial);
 
 // DELETE /api/historial/:id - Eliminar historial (veterinario solo los suyos, admin cualquiera)
 router.delete('/:id', eliminarHistorial);

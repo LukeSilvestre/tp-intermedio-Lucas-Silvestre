@@ -44,3 +44,18 @@ export const findVeterinarioById = async (id: number): Promise<Veterinario | nul
   const veterinarios = rows as Veterinario[];
   return veterinarios.length > 0 ? veterinarios[0] : null;
 };
+
+export const crearVeterinario = async (datos: {
+  nombre: string;
+  apellido: string;
+  matricula: string;
+  especialidad: string;
+  usuario_id: number;
+}): Promise<number> => {
+  const [result] = await pool.execute(
+    `INSERT INTO veterinarios (nombre, apellido, matricula, especialidad, usuario_id)
+     VALUES (?, ?, ?, ?, ?)`,
+    [datos.nombre, datos.apellido, datos.matricula, datos.especialidad, datos.usuario_id]
+  );
+  return (result as any).insertId;
+};
